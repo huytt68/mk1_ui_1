@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
-import { Col, Row, Button, Form, Input, InputNumber, Modal, Checkbox, message, Space } from 'antd';
+import {
+	Col,
+	Row,
+	Button,
+	Form,
+	Input,
+	InputNumber,
+	Modal,
+	Checkbox,
+	message,
+	Space,
+	Divider,
+} from 'antd';
 import axios from 'axios';
 
 const { TextArea } = Input;
 
 const Info = () => {
+	const API_URL = 'http://localhost:8080/info';
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [settingsData, setSettingsData] = useState({
 		headless: false,
@@ -60,10 +73,10 @@ const Info = () => {
 			console.log('Sending data:', dataToSend);
 
 			// Simulate API call
-			const response = await axios.post('http://localhost:8080/info', dataToSend, {
+			const response = await axios.post(API_URL, dataToSend, {
 				headers: { 'Content-Type': 'application/json' },
 			});
-			if (response.status == 200) {
+			if (response.status === 200) {
 				message.success('Data sent successfully!');
 			} else {
 				message.error('Failed to send data.');
@@ -78,11 +91,11 @@ const Info = () => {
 		<>
 			<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
 				<Col className="gutter-row" span={9}>
-					<Form form={form2} labelCol={{ span: 6 }} wrapperCol={{ span: 24 }} layout="vertical">
+					<Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 24 }} layout="vertical">
 						<Form.Item
 							name="linkUrls"
 							label="Link URLs"
-							rules={[{ required: true, message: 'Vui lòng nhập link URL!' }]}
+							rules={[{ required: true, message: 'Nhập ít nhất 1 URL!' }]}
 						>
 							<TextArea rows={38} />
 						</Form.Item>
@@ -90,7 +103,7 @@ const Info = () => {
 				</Col>
 				<Col className="gutter-row" span={15}>
 					<Form
-						form={form}
+						form={form2}
 						labelCol={{ span: 6 }}
 						wrapperCol={{ span: 18 }}
 						layout="horizontal"
@@ -102,14 +115,14 @@ const Info = () => {
 							label="Tên công ty"
 							rules={[{ required: true, message: 'Vui lòng nhập tên công ty!' }]}
 						>
-							<Input />
+							<Input placeholder="Tên công ty" />
 						</Form.Item>
 						<Form.Item
 							name="departmentName"
 							label="Tên bộ phận"
 							rules={[{ required: true, message: 'Vui lòng nhập tên bộ phận!' }]}
 						>
-							<Input />
+							<Input placeholder="Tên bộ phận" />
 						</Form.Item>
 						<Form.Item
 							name="managerName"
@@ -167,21 +180,21 @@ const Info = () => {
 								{ required: true, message: 'Vui lòng nhập email!' },
 							]}
 						>
-							<Input />
+							<Input placeholder="Email" />
 						</Form.Item>
 						<Form.Item
 							name="companyUrl"
 							label="URL công ty"
 							rules={[{ required: true, message: 'Vui lòng nhập URL công ty!' }]}
 						>
-							<Input />
+							<Input placeholder="URL công ty" />
 						</Form.Item>
 						<Form.Item
 							name="numberOfEmployees"
 							label="Số lượng người"
 							rules={[{ required: true, message: 'Vui lòng nhập số lượng người!' }]}
 						>
-							<InputNumber style={{ width: '100%' }} />
+							<InputNumber style={{ width: '100%' }} placeholder="Số lượng người" />
 						</Form.Item>
 						<Form.Item
 							name="phoneNumber"
@@ -218,42 +231,42 @@ const Info = () => {
 							label="Zipcode"
 							rules={[{ required: true, message: 'Vui lòng nhập zipcode!' }]}
 						>
-							<Input />
+							<Input placeholder="Zipcode" />
 						</Form.Item>
 						<Form.Item
 							name="province"
 							label="Tỉnh"
 							rules={[{ required: true, message: 'Vui lòng nhập tỉnh!' }]}
 						>
-							<Input />
+							<Input placeholder="Tỉnh" />
 						</Form.Item>
 						<Form.Item
 							name="city"
 							label="Thành phố, thị trấn"
 							rules={[{ required: true, message: 'Vui lòng nhập thành phố!' }]}
 						>
-							<Input />
+							<Input placeholder="Thành phố, thị trấn" />
 						</Form.Item>
 						<Form.Item
 							name="address"
 							label="Số nhà, toà"
 							rules={[{ required: true, message: 'Vui lòng nhập số nhà!' }]}
 						>
-							<Input />
+							<Input placeholder="Số nhà, toà" />
 						</Form.Item>
 						<Form.Item
 							name="issueTitle"
 							label="Tiêu đề vấn đề hỏi"
 							rules={[{ required: true, message: 'Vui lòng nhập tiêu đề!' }]}
 						>
-							<Input />
+							<Input placeholder="Tiêu đề vấn đề hỏi" />
 						</Form.Item>
 						<Form.Item
 							name="issueContent"
 							label="Nội dung hỏi"
 							rules={[{ required: true, message: 'Vui lòng nhập nội dung!' }]}
 						>
-							<TextArea rows={4} />
+							<TextArea rows={4} placeholder="Nội dung hỏi" />
 						</Form.Item>
 					</Form>
 				</Col>
@@ -284,127 +297,206 @@ const Info = () => {
 					layout="horizontal"
 					labelAlign="left"
 				>
+					<Divider />
 					<Form.Item label="headless">
-						<Checkbox
-							checked={settingsData.headless}
-							onChange={(e) => handleCheckboxChange('headless', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.headless}
+									onChange={(e) => handleCheckboxChange('headless', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span className="col-">
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="username">
-						<Input
-							value={settingsData.username}
-							onChange={(e) => handleCheckboxChange('username', e.target.value)}
-							style={{ 'max-width': '200px' }}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6}>
+								<Input
+									value={settingsData.username}
+									onChange={(e) => handleCheckboxChange('username', e.target.value)}
+									style={{ 'max-width': '200px' }}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="DoNotDuplicateSend">
-						<Checkbox
-							checked={settingsData.doNotDuplicateSend}
-							onChange={(e) => handleCheckboxChange('doNotDuplicateSend', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.doNotDuplicateSend}
+									onChange={(e) => handleCheckboxChange('doNotDuplicateSend', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="DoNotSend">
-						<Checkbox
-							checked={settingsData.doNotSend}
-							onChange={(e) => handleCheckboxChange('doNotSend', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.doNotSend}
+									onChange={(e) => handleCheckboxChange('doNotSend', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="DirectURL">
-						<Checkbox
-							checked={settingsData.directURL}
-							onChange={(e) => handleCheckboxChange('directURL', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.directURL}
+									onChange={(e) => handleCheckboxChange('directURL', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="DoNotSelectCheckbox">
-						<Checkbox
-							checked={settingsData.doNotSelectCheckbox}
-							onChange={(e) => handleCheckboxChange('doNotSelectCheckbox', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.doNotSelectCheckbox}
+									onChange={(e) => handleCheckboxChange('doNotSelectCheckbox', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="DoNotSelectRadio">
-						<Checkbox
-							checked={settingsData.doNotSelectRadio}
-							onChange={(e) => handleCheckboxChange('doNotSelectRadio', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.doNotSelectRadio}
+									onChange={(e) => handleCheckboxChange('doNotSelectRadio', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="DoNotSelectPulldown">
-						<Checkbox
-							checked={settingsData.doNotSelectPulldown}
-							onChange={(e) => handleCheckboxChange('doNotSelectPulldown', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.doNotSelectPulldown}
+									onChange={(e) => handleCheckboxChange('doNotSelectPulldown', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="ParallelProcess">
-						<Input
-							value={settingsData.parallelProcess}
-							onChange={(e) => handleCheckboxChange('parallelProcess', e.target.value)}
-							style={{ 'max-width': '200px' }}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6}>
+								<Input
+									value={settingsData.parallelProcess}
+									onChange={(e) => handleCheckboxChange('parallelProcess', e.target.value)}
+									style={{ 'max-width': '200px' }}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="stoptime">
-						<Input
-							value={settingsData.stoptime}
-							onChange={(e) => handleCheckboxChange('stoptime', e.target.value)}
-							style={{ 'max-width': '200px' }}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6}>
+								<Input
+									value={settingsData.stoptime}
+									onChange={(e) => handleCheckboxChange('stoptime', e.target.value)}
+									style={{ 'max-width': '200px' }}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="stopday">
-						<Input
-							value={settingsData.stopday}
-							onChange={(e) => handleCheckboxChange('stopday', e.target.value)}
-							style={{ 'max-width': '200px' }}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6}>
+								<Input
+									value={settingsData.stopday}
+									onChange={(e) => handleCheckboxChange('stopday', e.target.value)}
+									style={{ 'max-width': '200px' }}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="LABEL_TEXT">
-						<Checkbox
-							checked={settingsData.label1}
-							onChange={(e) => handleCheckboxChange('label1', e)}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6} style={{ textAlign: 'center' }}>
+								<Checkbox
+									checked={settingsData.label1}
+									onChange={(e) => handleCheckboxChange('label1', e)}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 					<Form.Item label="LABEL_TEXT">
-						<Input
-							value={settingsData.label2}
-							onChange={(e) => handleCheckboxChange('label2', e.target.value)}
-							style={{ 'max-width': '200px' }}
-						/>
-						<span>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
-						</span>
+						<Row>
+							<Col span={6}>
+								<Input
+									value={settingsData.label2}
+									onChange={(e) => handleCheckboxChange('label2', e.target.value)}
+									style={{ 'max-width': '200px' }}
+								/>
+							</Col>
+							<Col span={18}>
+								<span>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui nulla,
+								</span>
+							</Col>
+						</Row>
 					</Form.Item>
 				</Form>
 			</Modal>
