@@ -34,12 +34,19 @@ const Info = () => {
 		label1: false,
 		label2: '',
 	});
+	const [initialSettingsData, setInitialSettingsData] = useState({});
 
 	const [form] = Form.useForm();
 	const [form2] = Form.useForm();
 
-	const showModal = () => setIsModalOpen(true);
-	const handleCancel = () => setIsModalOpen(false);
+	const showModal = () => {
+		setInitialSettingsData(settingsData);
+		setIsModalOpen(true);
+	};
+	const handleCancel = () => {
+		setSettingsData(initialSettingsData);
+		setIsModalOpen(false);
+	};
 	const handleOk = () => {
 		console.log('Modal settings saved:', settingsData);
 		setIsModalOpen(false);
@@ -52,11 +59,58 @@ const Info = () => {
 		}));
 	};
 
+	const validateDataSend = async () => {
+		try {
+			// Validate form fields
+			const form2Data = await form2.validateFields();
+			const managerName = `${form2Data.managerName.firstName} ${form2Data.managerName.lastName}`;
+			const katakanaName = `${form2Data.katakanaName.firstName} ${form2Data.katakanaName.lastName}`;
+			const phoneNumber = `${form2Data.phoneNumber.firstPart}-${form2Data.phoneNumber.secondPart}-${form2Data.phoneNumber.thirdPart}`;
+			const fax = `${form2Data.fax.firstPart}-${form2Data.fax.secondPart}-${form2Data.fax.thirdPart}`;
+			const zipcode = `${form2Data.zipcode.firstPart}-${form2Data.zipcode.secondPart}`;
+			const sendData = {
+				...form2Data,
+				managerName: managerName,
+				katakanaName: katakanaName,
+				phoneNumber: phoneNumber,
+				fax: fax,
+				zipcode: zipcode,
+			};
+			return sendData;
+		} catch (error) {
+			message.error('Please check the form inputs!');
+			console.error(error);
+		}
+	};
+
+	const handleSaveInfo = async () => {
+		try {
+			const linkUrls = await form.validateFields();
+			const sendData = await validateDataSend();
+			const listUrl = linkUrls.linkUrls.trim().split('\n');
+			const dataToSend = {
+				data: {
+					setting: {
+						...settingsData,
+					},
+					data_send: {
+						...sendData,
+					},
+					list_urls: listUrl,
+				},
+			};
+			console.log('Data:', dataToSend);
+		} catch (error) {
+			message.error('Please check the form inputs!');
+			console.error(error);
+		}
+	};
+
 	const handleSendAPI = async () => {
 		try {
 			// Validate form fields
-			const sendData = await form.validateFields();
-			const linkUrls = await form2.validateFields();
+			const linkUrls = await form.validateFields();
+			const sendData = await validateDataSend();
 			const listUrl = linkUrls.linkUrls.trim().split('\n');
 			const dataToSend = {
 				data: {
@@ -124,52 +178,69 @@ const Info = () => {
 						>
 							<Input placeholder="Tên bộ phận" />
 						</Form.Item>
-						<Form.Item
-							name="managerName"
-							label="Tên người đảm nhiệm"
-							rules={[{ required: true, message: 'Vui lòng nhập người đảm nhiệm!' }]}
-						>
+						<Form.Item label="Tên người đảm nhiệm" required>
 							<Space.Compact
 								style={{
 									width: '100%',
 								}}
+								rules={[{ required: true, message: 'Vui lòng nhập người đảm nhiệm!' }]}
 							>
-								<Input
-									style={{
-										width: '50%',
-									}}
-									placeholder="Họ"
-								/>
-								<Input
-									style={{
-										width: '50%',
-									}}
-									placeholder="Tên"
-								/>
+								<Form.Item
+									name={['managerName', 'firstName']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+								>
+									<Input
+										style={{
+											width: '50%',
+										}}
+										placeholder="Họ"
+									/>
+								</Form.Item>
+								<Form.Item
+									name={['managerName', 'lastName']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+								>
+									<Input
+										style={{
+											width: '50%',
+										}}
+										placeholder="Tên"
+									/>
+								</Form.Item>
 							</Space.Compact>
 						</Form.Item>
-						<Form.Item
-							name="katakanaName"
-							label="Tên katakana"
-							rules={[{ required: true, message: 'Vui lòng nhập tên katakana!' }]}
-						>
+						<Form.Item label="Tên katakana" required>
 							<Space.Compact
 								style={{
 									width: '100%',
 								}}
 							>
-								<Input
-									style={{
-										width: '50%',
-									}}
-									placeholder="Họ"
-								/>
-								<Input
-									style={{
-										width: '50%',
-									}}
-									placeholder="Tên"
-								/>
+								<Form.Item
+									name={['katakanaName', 'firstName']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+								>
+									<Input
+										style={{
+											width: '50%',
+										}}
+										placeholder="Họ"
+									/>
+								</Form.Item>
+								<Form.Item
+									name={['katakanaName', 'lastName']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+								>
+									<Input
+										style={{
+											width: '50%',
+										}}
+										placeholder="Tên"
+									/>
+								</Form.Item>
 							</Space.Compact>
 						</Form.Item>
 						<Form.Item
@@ -196,42 +267,94 @@ const Info = () => {
 						>
 							<InputNumber style={{ width: '100%' }} placeholder="Số lượng người" />
 						</Form.Item>
-						<Form.Item
-							name="phoneNumber"
-							label="SĐT"
-							rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
-						>
+						<Form.Item label="SĐT" required>
 							<Space
 								style={{
 									display: 'flex',
 								}}
 							>
-								<Input /> -
-								<Input /> -
-								<Input />
+								<Form.Item
+									name={['phoneNumber', 'firstPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập SĐT!' }]}
+								>
+									<Input />
+								</Form.Item>
+								-
+								<Form.Item
+									name={['phoneNumber', 'secondPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập SĐT!' }]}
+								>
+									<Input />
+								</Form.Item>
+								-
+								<Form.Item
+									name={['phoneNumber', 'thirdPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập SĐT!' }]}
+								>
+									<Input />
+								</Form.Item>
 							</Space>
 						</Form.Item>
-						<Form.Item
-							name="fax"
-							label="Fax"
-							rules={[{ required: true, message: 'Vui lòng nhập số fax!' }]}
-						>
+						<Form.Item label="Fax" required>
 							<Space
 								style={{
 									display: 'flex',
 								}}
 							>
-								<Input /> -
-								<Input /> -
-								<Input />
+								<Form.Item
+									name={['fax', 'firstPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập số fax!' }]}
+								>
+									<Input />
+								</Form.Item>
+								-
+								<Form.Item
+									name={['fax', 'secondPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập số fax!' }]}
+								>
+									<Input />
+								</Form.Item>
+								-
+								<Form.Item
+									name={['fax', 'thirdPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập số fax!' }]}
+								>
+									<Input />
+								</Form.Item>
 							</Space>
 						</Form.Item>
-						<Form.Item
-							name="zipcode"
-							label="Zipcode"
-							rules={[{ required: true, message: 'Vui lòng nhập zipcode!' }]}
-						>
-							<Input placeholder="Zipcode" />
+						<Form.Item label="Zipcode" required>
+							<Space.Compact
+								style={{
+									display: 'flex',
+									width: '100%',
+									gap: '8px',
+								}}
+							>
+								<Form.Item
+									name={['zipcode', 'firstPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập zipcode!' }]}
+									style={{ flex: 1 }}
+								>
+									<Input />
+								</Form.Item>
+								<span style={{ display: 'flex', alignItems: 'center' }}>-</span>
+								<Form.Item
+									name={['zipcode', 'secondPart']}
+									noStyle
+									rules={[{ required: true, message: 'Vui lòng nhập zipcode!' }]}
+									style={{ flex: 1 }}
+								>
+									<Input />
+								</Form.Item>
+							</Space.Compact>
 						</Form.Item>
 						<Form.Item
 							name="province"
@@ -279,17 +402,29 @@ const Info = () => {
 					Settings
 				</Button>
 				<Button style={{ 'min-width': '120px' }}>Help</Button>
-				<Button style={{ 'min-width': '120px' }}>Save</Button>
+				<Button style={{ 'min-width': '120px' }} onClick={handleSaveInfo}>
+					Save
+				</Button>
 				<Button type="primary" style={{ 'min-width': '120px' }} onClick={handleSendAPI}>
 					Send API
 				</Button>
 			</Row>
+
+			{/* Modal */}
 			<Modal
 				title="Settings"
 				open={isModalOpen}
 				onOk={handleOk}
 				onCancel={handleCancel}
 				width={'80%'}
+				footer={[
+					<Button key="back" onClick={handleCancel} style={{ 'min-width': '120px' }}>
+						Cancel
+					</Button>,
+					<Button key="submit" type="primary" onClick={handleOk} style={{ 'min-width': '120px' }}>
+						Submit
+					</Button>,
+				]}
 			>
 				<Form
 					labelCol={{ span: 4 }}

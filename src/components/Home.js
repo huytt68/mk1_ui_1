@@ -44,7 +44,7 @@ const Home = () => {
 					display: 'flex',
 					alignItems: 'center',
 					position: 'sticky',
-					zIndex: 1,
+					zIndex: 1000,
 					width: '100%',
 					top: 0,
 				}}
@@ -91,7 +91,7 @@ const Home = () => {
 						style={{
 							padding: 24,
 							margin: 0,
-							minHeight: 280,
+							minHeight: 450,
 							background: colorBgContainer,
 							borderRadius: borderRadiusLG,
 						}}
